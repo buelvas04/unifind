@@ -115,6 +115,24 @@
         .pagination {
             margin-top: 20px;
         }
+
+        .recuperar-btn {
+            background: #15803d;
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .aviso {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 14px;
+        }
     </style>
 </head>
 <body>
@@ -136,6 +154,10 @@
                 + Reportar objeto
             </a>
         </div>
+
+        @if (session('success'))
+            <div class="aviso" role="status">{{ session('success') }}</div>
+        @endif
 
         <div class="table-container">
 
@@ -160,6 +182,7 @@
                             <th>Lugar</th>
                             <th>Fecha</th>
                             <th>Estado</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
 
@@ -196,6 +219,21 @@
                                     <span class="estado">
                                         {{ ucfirst($objeto->estado) }}
                                     </span>
+                                </td>
+                                <td>
+                                    @if ($objeto->estado === 'perdido')
+                                        <form method="POST"
+                                              action="{{ route('objetos-perdidos.recuperado', $objeto->id) }}"
+                                              onsubmit="return confirm('¿Confirmas que este objeto ya fue recuperado físicamente? Se retirará de Explorar, pero permanecerá en tu historial.');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="recuperar-btn">
+                                                Marcar recuperado
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span style="color:#15803d;font-weight:bold;">✓ Recuperado</span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
