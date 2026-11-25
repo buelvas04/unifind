@@ -22,6 +22,21 @@ class ObjetoPerdidoController extends Controller
         return view('objetos-perdidos.index', compact('objetos'));
     }
 
+    // Permite cerrar un reporte de pérdida que ya fue recuperado,
+    // incluso si el usuario no lo vinculó al solicitar la entrega.
+    public function marcarRecuperado(Request $request, ObjetoPerdido $objeto)
+    {
+        abort_unless((int) $objeto->usuario_id === (int) $request->user()->id, 403);
+
+        if ($objeto->estado === 'perdido') {
+            $objeto->estado = 'recuperado';
+            $objeto->save();
+        }
+
+        return redirect()->route('objetos-perdidos.index')
+            ->with('success', 'Reporte marcado como recuperado. Ya no aparece en Explorar.');
+    }
+
     public function create()
     {
         $categorias = Categoria::orderBy('nombre')->get();
