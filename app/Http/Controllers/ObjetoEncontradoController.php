@@ -59,9 +59,25 @@ public function explorar(Request $request)
         ->orderByDesc('created_at')
         ->get();
 
+    // Reportes de objetos perdidos de toda la comunidad.
+    // Se muestran separados de los encontrados; no generan solicitudes de recuperación.
+    $perdidosPublicos = \App\Models\ObjetoPerdido::query()
+        ->with('categoria')
+        ->where('estado', 'perdido')
+        ->when($busqueda !== '', function ($consulta) use ($busqueda) {
+            $consulta->where(function ($q) use ($busqueda) {
+                $q->where('titulo', 'like', '%' . $busqueda . '%')
+                  ->orWhere('descripcion', 'like', '%' . $busqueda . '%')
+                  ->orWhere('lugar_perdida', 'like', '%' . $busqueda . '%');
+            });
+        })
+        ->orderByDesc('created_at')
+        ->paginate(8, ['*'], 'perdidos_page')
+        ->withQueryString();
+
     return view(
         'objetos-encontrados.explorar',
-        compact('objetos', 'busqueda', 'objetosPerdidos')
+        compact('objetos', 'busqueda', 'objetosPerdidos', 'perdidosPublicos')
     );
 }
 
