@@ -36,6 +36,11 @@ Route::middleware('auth')->group(function () {
         'store'
     ])->name('objetos-perdidos.store');
 
+    Route::patch('/mis-objetos-perdidos/{objeto}/recuperado', [
+        ObjetoPerdidoController::class,
+        'marcarRecuperado'
+    ])->name('objetos-perdidos.recuperado');
+
     // Objetos encontrados
     Route::get('/objetos-encontrados/crear', [
         ObjetoEncontradoController::class,
