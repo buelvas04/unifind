@@ -42,6 +42,12 @@ public function explorar(Request $request)
     $objetos = ObjetoEncontrado::query()
         ->with('categoria')
         ->where('estado', 'disponible')
+        // Ocultar una entrega completada aunque el estado antiguo no se haya sincronizado.
+        ->whereDoesntHave('solicitudes', function ($consulta) {
+            $consulta->where('estado', 'aceptada')
+                ->where('confirmacion_entrega', true)
+                ->where('confirmacion_recepcion', true);
+        })
         ->when($busqueda !== '', function ($consulta) use ($busqueda) {
             $consulta->where(function ($q) use ($busqueda) {
                 $q->where('titulo', 'like', '%' . $busqueda . '%')
@@ -64,6 +70,15 @@ public function explorar(Request $request)
     $perdidosPublicos = \App\Models\ObjetoPerdido::query()
         ->with('categoria')
         ->where('estado', 'perdido')
+        // Solo retirar el reporte de pérdida vinculado a una entrega ya completada.
+        ->whereNotIn('id', function ($consulta) {
+            $consulta->select('objeto_perdido_id')
+                ->from('solicitudes_recuperacion')
+                ->whereNotNull('objeto_perdido_id')
+                ->where('estado', 'aceptada')
+                ->where('confirmacion_entrega', true)
+                ->where('confirmacion_recepcion', true);
+        })
         ->when($busqueda !== '', function ($consulta) use ($busqueda) {
             $consulta->where(function ($q) use ($busqueda) {
                 $q->where('titulo', 'like', '%' . $busqueda . '%')
