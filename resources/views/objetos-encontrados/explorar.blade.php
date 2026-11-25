@@ -1210,6 +1210,73 @@
 
                 @endif
 
+                <!-- REPORTES DE OBJETOS PERDIDOS DE LA COMUNIDAD -->
+                <section style="margin-top: 40px;" aria-labelledby="perdidos-titulo">
+                    <h2 id="perdidos-titulo" style="font-size: 23px; margin-bottom: 8px;">
+                        Objetos reportados como perdidos
+                    </h2>
+                    <p class="intro" style="margin-bottom: 18px;">
+                        Estos son reportes de pérdidas de la comunidad universitaria.
+                        Si encuentras alguno, publícalo como objeto encontrado para
+                        que UniFind pueda detectar una coincidencia.
+                    </p>
+
+                    @if ($perdidosPublicos->isEmpty())
+                        <div class="empty">
+                            <h2>No hay reportes de pérdidas con esta búsqueda.</h2>
+                        </div>
+                    @else
+                        <div class="grid">
+                            @foreach ($perdidosPublicos as $perdidoPublico)
+                                <article class="card">
+                                    @if ($perdidoPublico->imagen)
+                                        <div class="photo-box">
+                                            <img
+                                                src="{{ asset('storage/' . $perdidoPublico->imagen) }}"
+                                                alt="Imagen del objeto perdido: {{ $perdidoPublico->titulo }}"
+                                                loading="lazy"
+                                            >
+                                        </div>
+                                    @else
+                                        <div class="no-image">Sin fotografía</div>
+                                    @endif
+
+                                    <div class="details">
+                                        <h2>{{ $perdidoPublico->titulo }}</h2>
+                                        <p><strong>Categoría:</strong>
+                                            {{ $perdidoPublico->categoria?->nombre ?? 'Sin categoría' }}
+                                        </p>
+                                        <p><strong>Descripción:</strong>
+                                            {{ $perdidoPublico->descripcion }}
+                                        </p>
+                                        <p><strong>Lugar de pérdida:</strong>
+                                            {{ $perdidoPublico->lugar_perdida }}
+                                        </p>
+                                        <p><strong>Fecha de pérdida:</strong>
+                                            {{ $perdidoPublico->fecha_perdida?->format('d/m/Y') }}
+                                        </p>
+                                        <span class="tag">Perdido</span>
+                                    </div>
+
+                                    <div class="request-panel">
+                                        <h3>¿Encontraste este objeto?</h3>
+                                        <p>Publícalo como encontrado para que el sistema
+                                           lo compare con este reporte.</p>
+                                        <a class="request-button"
+                                           style="display:block;text-align:center;text-decoration:none;"
+                                           href="{{ route('objetos-encontrados.create') }}">
+                                            Reportar objeto encontrado
+                                        </a>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                        <div class="pagination">
+                            {{ $perdidosPublicos->links() }}
+                        </div>
+                    @endif
+                </section>
+
             </main>
 
         </div>
